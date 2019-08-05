@@ -38,6 +38,7 @@ function spaceChildren(children: React.ReactNode, needInserted: boolean) {
     if (isPrevChildPure && isCurrentChildPure) {
       const lastIndex = childList.length - 1;
       const lastChild = childList[lastIndex];
+      // 合并为一个字符串
       childList[lastIndex] = `${lastChild}${child}`;
     } else {
       childList.push(child);
@@ -52,5 +53,30 @@ function spaceChildren(children: React.ReactNode, needInserted: boolean) {
   );
 }
 
+// Insert one space between two chinese characters automatically.
+function insertSpace(child: React.ReactChild, needInserted: boolean) {
+  // Check the child if is undefined or null.
+  if (child == null) {
+    return;
+  }
+  const SPACE = needInserted ? ' ' : '';
+  // strictNullChecks oops.
+  if (
+    typeof child !== 'string' &&
+    typeof child !== 'number' &&
+    isString(child.type) &&
+    isTwoCNChar(child.props.children)
+  ) {
+    // 返回一个用空格隔开的 children 字符串的节点
+    return React.cloneElement(child, {}, child.props.children.split('').join(SPACE));
+  }
+  if (typeof child === 'string') {
+    if (isTwoCNChar(child)) {
+      child = child.split('').join(SPACE);
+    }
+    return <span>{child}</span>;
+  }
+  return child;
+}
 // ...
 ```
