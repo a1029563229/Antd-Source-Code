@@ -45,4 +45,24 @@ class Button extends React.Component<ButtonProps, ButtonState> {
   }
   //...
 }
+
+// ReactDOM.findDOMNode(component) 如果组件已经被挂载到 DOM 上，此方法会返回浏览器中相应的原生 DOM 元素。
+// 此方法对于从 DOM 中读取值很有用，例如获取表单字段的值或者执行 DOM 检测。
+// 大多数情况下，你可以绑定一个 ref 到 DOM 节点上，可以完全避免使用 findDOMNode
+// 注意：findDOMNode 是一个访问底层 DOM 节点的应急方案（escape hatch）。在大多数情况下，不推荐使用该方法，因为它会破坏组件的抽象结构。
+import { findDOMNode } from 'react-dom';
+
+// anim(el,animationName,function(){}); 使用这个方法可以让 el 节点播放指定 animationName 动画
+import TransitionEvents from 'css-animation/lib/Event';
+
+// Where el is the DOM element you'd like to test for visibility
+function isHidden(element: HTMLElement) {
+  if (process.env.NODE_ENV === 'test') {
+    return false;
+  }
+
+  // 元素是否存在
+  // offsetParent：在 Webkit 中，如果元素为隐藏的（该元素或其祖先元素的 style.display 为 "none"），或者该元素的 style.position 被设为 "fixed"，则该属性返回 null。
+  return !element || element.offsetParent === null;
+}
 ```
