@@ -96,7 +96,7 @@ export default class Row extends React.Component<RowProps, RowState> {
         ? {
             marginLeft: gutter! / -2,
             marginRight: gutter! / -2,
-            ...style,
+            ...style
           }
         : style;
     const otherProps = { ...others };
@@ -142,7 +142,13 @@ function generator({ suffixCls, tagName }: GeneratorProps) {
         const { prefixCls: customizePrefixCls } = this.props;
         const prefixCls = getPrefixCls(suffixCls, customizePrefixCls);
 
-        return <BasicComponent prefixCls={prefixCls} tagName={tagName} {...this.props} />;
+        return (
+          <BasicComponent
+            prefixCls={prefixCls}
+            tagName={tagName}
+            {...this.props}
+          />
+        );
       };
 
       render() {
@@ -156,12 +162,12 @@ function generator({ suffixCls, tagName }: GeneratorProps) {
 // 以 element 元素为样板克隆并返回新的 React 元素。返回元素的 props 是将新的 props 和原始元素的 props 浅层合并后的结果。
 // 新的子元素将取代现有的子元素，来自原始元素的 key 和 ref 将被保留
 // React.cloneElement() 几乎等同于：<element.type {...element.props} {...props}>{children}</element.type>
-import { cloneElement } from 'react';
+import { cloneElement } from "react";
 
 // 通过使用 onFieldsChange 与 mapPropsToFields，可以把表单的数据存储到上层组件或者 Redux、dva 中，更多可参考 rc-form 示例。
 // 注意：mapPropsToFields 里面返回的表单域数据必须使用 Form.createFormField 包装。
 const CustomizedForm = Form.create({
-  name: 'global_state',
+  name: "global_state",
   onFieldsChange(props, changedFields) {
     props.onChange(changedFields);
   },
@@ -169,20 +175,20 @@ const CustomizedForm = Form.create({
     return {
       username: Form.createFormField({
         ...props.username,
-        value: props.username.value,
-      }),
+        value: props.username.value
+      })
     };
   },
   onValuesChange(_, values) {
     console.log(values);
-  },
+  }
 })(props => {
   const { getFieldDecorator } = props.form;
   return (
     <Form layout="inline">
       <Form.Item label="Username">
-        {getFieldDecorator('username', {
-          rules: [{ required: true, message: 'Username is required!' }],
+        {getFieldDecorator("username", {
+          rules: [{ required: true, message: "Username is required!" }]
         })(<Input />)}
       </Form.Item>
     </Form>
@@ -193,14 +199,14 @@ class Demo extends React.Component {
   state = {
     fields: {
       username: {
-        value: 'benjycui',
-      },
-    },
+        value: "benjycui"
+      }
+    }
   };
 
   handleFormChange = changedFields => {
     this.setState(({ fields }) => ({
-      fields: { ...fields, ...changedFields },
+      fields: { ...fields, ...changedFields }
     }));
   };
 
@@ -214,4 +220,60 @@ class Demo extends React.Component {
     );
   }
 }
+
+class Field {
+  constructor(fields) {
+    // 将 fields 属性赋值给当前类
+    // 批量赋值
+    Object.assign(this, fields);
+  }
+}
+
+// 复制组件的静态方法到新的组件
+import hoistStatics from "hoist-non-react-statics";
+
+// 依次降序判断入参，智能判断
+// 猜测是用于 form.validateFields([fieldNames: string[]], [options: object], callback(errors, values))
+export function getParams(ns, opt, cb) {
+  let names = ns;
+  let options = opt;
+  let callback = cb;
+  if (cb === undefined) {
+    if (typeof names === "function") {
+      callback = names;
+      options = {};
+      names = undefined;
+    } else if (Array.isArray(names)) {
+      if (typeof options === "function") {
+        callback = options;
+        options = {};
+      } else {
+        options = options || {};
+      }
+    } else {
+      callback = options;
+      options = names || {};
+      names = undefined;
+    }
+  }
+  return {
+    names,
+    options,
+    callback
+  };
+}
+
+// 利用 lastIndexOf 来判断是否是以 prefix 为前缀的字符串
+export function startsWith(str, prefix) {
+  return str.lastIndexOf(prefix, 0) === 0;
+}
+
+// 利用 reduce 重置组件（对象）的值，并返回改变后的对象
+return names.reduce((acc, name) => {
+  const field = fields[name];
+  if (field && "value" in field) {
+    acc[name] = {};
+  }
+  return acc;
+}, {});
 ```
