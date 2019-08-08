@@ -83,4 +83,135 @@ this.clickWaveTimeoutId = window.setTimeout(
 
 // 响应css媒体查询的轻量级javascript库
 const enquire = require("enquire.js");
+
+export default class Row extends React.Component<RowProps, RowState> {
+  // ...
+  renderRow = ({ getPrefixCls }: ConfigConsumerProps) => {
+    // ...
+    // 取 gutter 赋值给 style 中的 marginLeft 和 marginRight
+    // 这里是赋值负数，暂时不太清楚用途是什么，效果是可以让父级的宽度更宽
+    // 感叹号是非null和非undefined的类型断言
+    const rowStyle =
+      gutter! > 0
+        ? {
+            marginLeft: gutter! / -2,
+            marginRight: gutter! / -2,
+            ...style,
+          }
+        : style;
+    const otherProps = { ...others };
+    delete otherProps.gutter;
+    return (
+      // 通过 RowContext.Provider（通过 React.createContext 创建） 组件的 value 属性将 gutter 传递给子组件（col）
+      // React.createContext：创建一个 Context 对象。当 React 渲染一个订阅了这个 Context 对象的组件，
+      // 这个组件会从组件树中离自身最近的那个匹配的 Provider 中读取到当前的 context 值
+      // Context.Provider：每个 Context 对象都会返回一个 Provider React 组件，它允许消费组件订阅 context 的变化。
+      // Provider 接收一个 value 属性，传递给消费组件。一个 Provider 可以和多个消费组件有对应关系。多个 Provider 也可以嵌套使用，里层的会覆盖外层的数据。
+      // 当 Provider 的 value 值发生变化时，它内部的所有消费组件都会重新渲染。
+      // Provider 及其内部 consumer（消费者） 组件都不受制于 shouldComponentUpdate 函数，因此当 consumer 组件在其祖先组件退出更新的情况下也能更新。
+      // 通过新旧值检测来确定变化，使用了与 Object.is 相同的算法。
+      // Context.Consumer：这里，React 组件也可以订阅到 context 变更。这能让你在函数式组件中完成订阅 context。
+      // 这需要函数作为子元素（function as a child）这种做法。这个函数接收当前的 context 值返回一个 React 节点。
+      // 传递给函数的 value 值等同于往上组件树这个 context 最近的 Provider 提供的 value 值。
+      // 如果没有对应的 Provider，value 参数等同于传递给 createContext() 的 defaultValue。
+      <RowContext.Provider value={{ gutter }}>
+        <div {...otherProps} className={classes} style={rowStyle}>
+          {children}
+        </div>
+      </RowContext.Provider>
+    );
+  };
+
+  render() {
+    return <ConfigConsumer>{this.renderRow}</ConfigConsumer>;
+  }
+}
+
+// 利用 generator 进行参数控制
+// 在返回的函数中传入主体
+// 属于函数柯里化和装饰器模式
+function generator({ suffixCls, tagName }: GeneratorProps) {
+  return (BasicComponent: React.ComponentClass<BasicPropsWithTagName>): any => {
+    return class Adapter extends React.Component<BasicProps, any> {
+      static Header: any;
+      static Footer: any;
+      static Content: any;
+      static Sider: any;
+
+      renderComponent = ({ getPrefixCls }: ConfigConsumerProps) => {
+        const { prefixCls: customizePrefixCls } = this.props;
+        const prefixCls = getPrefixCls(suffixCls, customizePrefixCls);
+
+        return <BasicComponent prefixCls={prefixCls} tagName={tagName} {...this.props} />;
+      };
+
+      render() {
+        return <ConfigConsumer>{this.renderComponent}</ConfigConsumer>;
+      }
+    };
+  };
+}
+
+// React.cloneElement(element, [props], [...children])
+// 以 element 元素为样板克隆并返回新的 React 元素。返回元素的 props 是将新的 props 和原始元素的 props 浅层合并后的结果。
+// 新的子元素将取代现有的子元素，来自原始元素的 key 和 ref 将被保留
+// React.cloneElement() 几乎等同于：<element.type {...element.props} {...props}>{children}</element.type>
+import { cloneElement } from 'react';
+
+// 通过使用 onFieldsChange 与 mapPropsToFields，可以把表单的数据存储到上层组件或者 Redux、dva 中，更多可参考 rc-form 示例。
+// 注意：mapPropsToFields 里面返回的表单域数据必须使用 Form.createFormField 包装。
+const CustomizedForm = Form.create({
+  name: 'global_state',
+  onFieldsChange(props, changedFields) {
+    props.onChange(changedFields);
+  },
+  mapPropsToFields(props) {
+    return {
+      username: Form.createFormField({
+        ...props.username,
+        value: props.username.value,
+      }),
+    };
+  },
+  onValuesChange(_, values) {
+    console.log(values);
+  },
+})(props => {
+  const { getFieldDecorator } = props.form;
+  return (
+    <Form layout="inline">
+      <Form.Item label="Username">
+        {getFieldDecorator('username', {
+          rules: [{ required: true, message: 'Username is required!' }],
+        })(<Input />)}
+      </Form.Item>
+    </Form>
+  );
+});
+
+class Demo extends React.Component {
+  state = {
+    fields: {
+      username: {
+        value: 'benjycui',
+      },
+    },
+  };
+
+  handleFormChange = changedFields => {
+    this.setState(({ fields }) => ({
+      fields: { ...fields, ...changedFields },
+    }));
+  };
+
+  render() {
+    const { fields } = this.state;
+    return (
+      <div>
+        <CustomizedForm {...fields} onChange={this.handleFormChange} />
+        <pre className="language-bash">{JSON.stringify(fields, null, 2)}</pre>
+      </div>
+    );
+  }
+}
 ```
