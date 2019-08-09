@@ -209,6 +209,7 @@ function createBaseForm(option = {}, mixins = []) {
       // 经过 getFieldDecorator 包装的控件，
       // 表单控件会自动添加 value（或 valuePropName 指定的其他属性） onChange（或 trigger 指定的其他属性），数据同步将被 Form 接管
       getFieldDecorator(name, fieldOption) {
+        // 返回了一个完成了事件绑定（收集事件和验证事件）的 props
         const props = this.getFieldProps(name, fieldOption);
         return fieldElem => {
           // We should put field in record if it is rendered
@@ -284,6 +285,7 @@ function createBaseForm(option = {}, mixins = []) {
         const {
           rules,
           trigger,
+          // validateTrigger 默认取 trigger 的值，所以校验子节点值的时机，默认与收集子节点的值的时机一致
           validateTrigger = trigger,
           validate
         } = fieldOption;
@@ -301,12 +303,15 @@ function createBaseForm(option = {}, mixins = []) {
           inputProps[fieldNameProp] = formName ? `${formName}_${name}` : name;
         }
 
+        // 根据 validateTrigger 生成 trigger
         const validateRules = normalizeValidateRules(
           validate,
           rules,
           validateTrigger
         );
         const validateTriggers = getValidateTriggers(validateRules);
+        // action 为 onChange、onBlur 这类的事件
+        // validateTrigger 使用的是 forEach 进行绑定，所以可以接收多个 validateTrigger
         validateTriggers.forEach(action => {
           if (inputProps[action]) return;
           inputProps[action] = this.getCacheBind(
@@ -317,6 +322,8 @@ function createBaseForm(option = {}, mixins = []) {
         });
 
         // make sure that the value will be collect
+        // 如果 trigger 和 validateTrigger 的触发事件一致，则不单独绑定收集值事件
+        // onCollectValidate 在验证值的同时会完成值的收集
         if (trigger && validateTriggers.indexOf(trigger) === -1) {
           inputProps[trigger] = this.getCacheBind(
             name,
@@ -363,6 +370,7 @@ function createBaseForm(option = {}, mixins = []) {
           maybeNestedFields
         );
         this.fieldsStore.setFields(fields);
+        // 当字段发生改变时，触发该函数
         if (onFieldsChange) {
           const changedFields = Object.keys(fields).reduce(
             (acc, name) => set(acc, name, this.fieldsStore.getField(name)),
@@ -380,6 +388,9 @@ function createBaseForm(option = {}, mixins = []) {
         this.forceUpdate(callback);
       },
 
+      // ({ [fieldName]: value }, callback: Function ) => void
+      // 设置一组输入控件的值
+      // 该函数会同时触发 onValuesChange 和 onFieldsChange 事件
       setFieldsValue(changedValues, callback) {
         const { fieldsMeta } = this.fieldsStore;
         const values = this.fieldsStore.flattenRegisteredFields(changedValues);
@@ -400,6 +411,7 @@ function createBaseForm(option = {}, mixins = []) {
           }
           return acc;
         }, {});
+        // 设置字段
         this.setFields(newFields, callback);
         if (onValuesChange) {
           const allValues = this.fieldsStore.getAllValues();
@@ -414,6 +426,7 @@ function createBaseForm(option = {}, mixins = []) {
         }
       },
 
+      // debugger
       saveRef(name, _, component) {
         if (!component) {
           const fieldMeta = this.fieldsStore.getFieldMeta(name);
