@@ -182,7 +182,6 @@ class FieldsStore {
     };
   }
 
-  // debugger
   getNotCollectedFields() {
     const fieldsName = this.getValidFieldsName();
     return fieldsName
@@ -208,6 +207,7 @@ class FieldsStore {
 
   getNestedFields(names, getter) {
     const fields = names || this.getValidFieldsName();
+    // 利用 reduce + lodash 的 set 方法，由数组返回了一个新的对象
     return fields.reduce((acc, f) => set(acc, f, getter(f)), {});
   }
 

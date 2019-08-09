@@ -276,4 +276,30 @@ return names.reduce((acc, name) => {
   }
   return acc;
 }, {});
+
+getNestedFields(names, getter) {
+    const fields = names || this.getValidFieldsName();
+    // 利用 reduce + lodash 的 set 方法，由数组返回了一个新的对象
+    return fields.reduce((acc, f) => set(acc, f, getter(f)), {});
+}
+
+// 不通过 es6，通过 create-react-class 来创建 React 组件
+import createReactClass from 'create-react-class';
+// 一个异步验证插件，用于验证值
+import AsyncValidator from 'async-validator';
+// 在满足条件时弹出提示
+import warning from 'warning';
+import get from 'lodash/get';
+import set from 'lodash/set';
+// _.eq(value, other) 比较两者的值是否相等
+import eq from 'lodash/eq';
+// 创建 fields 集合的组件
+import createFieldsStore from './createFieldsStore';
+
+// 装饰器模式的另一个作用是创建一个属于自己的作用域，在作用域范围内可以访问一些变量
+componentWillReceiveProps(nextProps) {
+  if (mapPropsToFields) {
+    this.fieldsStore.updateFields(mapPropsToFields(nextProps));
+  }
+}
 ```
