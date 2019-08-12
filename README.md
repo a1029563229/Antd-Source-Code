@@ -18,7 +18,7 @@
 + [throttleByAnimationFrame](https://github.com/a1029563229/Antd-Source-Code/tree/master/Components/Util/throttleByAnimationFrame)
 
 ## lib（第三方库）
-+ [rc-form](https://github.com/a1029563229/Antd-Source-Code/tree/master/Components/lib/rc-form)
++ [rc-form](https://github.com/a1029563229/Antd-Source-Code/tree/master/lib/rc-form)
 
 ## 其他
 + [新知识（个人）](https://github.com/a1029563229/Antd-Source-Code/tree/master/New)
