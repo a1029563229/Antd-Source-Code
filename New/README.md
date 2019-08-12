@@ -1,9 +1,6 @@
 # 新知识（个人）
 
 ```tsx
-// Props 类型
-import * as PropTypes from "prop-types";
-
 // 返回一个字符串数组的方法，用于定义枚举类型
 export const tuple = <T extends string[]>(...args: T) => args;
 
@@ -48,15 +45,6 @@ class Button extends React.Component<ButtonProps, ButtonState> {
   }
   //...
 }
-
-// ReactDOM.findDOMNode(component) 如果组件已经被挂载到 DOM 上，此方法会返回浏览器中相应的原生 DOM 元素。
-// 此方法对于从 DOM 中读取值很有用，例如获取表单字段的值或者执行 DOM 检测。
-// 大多数情况下，你可以绑定一个 ref 到 DOM 节点上，可以完全避免使用 findDOMNode
-// 注意：findDOMNode 是一个访问底层 DOM 节点的应急方案（escape hatch）。在大多数情况下，不推荐使用该方法，因为它会破坏组件的抽象结构。
-import { findDOMNode } from "react-dom";
-
-// anim(el,animationName,function(){}); 使用这个方法可以让 el 节点播放指定 animationName 动画
-import TransitionEvents from "css-animation/lib/Event";
 
 // Where el is the DOM element you'd like to test for visibility
 function isHidden(element: HTMLElement) {
@@ -158,12 +146,6 @@ function generator({ suffixCls, tagName }: GeneratorProps) {
   };
 }
 
-// React.cloneElement(element, [props], [...children])
-// 以 element 元素为样板克隆并返回新的 React 元素。返回元素的 props 是将新的 props 和原始元素的 props 浅层合并后的结果。
-// 新的子元素将取代现有的子元素，来自原始元素的 key 和 ref 将被保留
-// React.cloneElement() 几乎等同于：<element.type {...element.props} {...props}>{children}</element.type>
-import { cloneElement } from "react";
-
 // 通过使用 onFieldsChange 与 mapPropsToFields，可以把表单的数据存储到上层组件或者 Redux、dva 中，更多可参考 rc-form 示例。
 // 注意：mapPropsToFields 里面返回的表单域数据必须使用 Form.createFormField 包装。
 const CustomizedForm = Form.create({
@@ -229,9 +211,6 @@ class Field {
   }
 }
 
-// 复制组件的静态方法到新的组件
-import hoistStatics from "hoist-non-react-statics";
-
 // 依次降序判断入参，智能判断
 // 猜测是用于 form.validateFields([fieldNames: string[]], [options: object], callback(errors, values))
 export function getParams(ns, opt, cb) {
@@ -283,23 +262,96 @@ getNestedFields(names, getter) {
     return fields.reduce((acc, f) => set(acc, f, getter(f)), {});
 }
 
-// 不通过 es6，通过 create-react-class 来创建 React 组件
-import createReactClass from 'create-react-class';
-// 一个异步验证插件，用于验证值
-import AsyncValidator from 'async-validator';
-// 在满足条件时弹出提示
-import warning from 'warning';
-import get from 'lodash/get';
-import set from 'lodash/set';
-// _.eq(value, other) 比较两者的值是否相等
-import eq from 'lodash/eq';
-// 创建 fields 集合的组件
-import createFieldsStore from './createFieldsStore';
-
 // 装饰器模式的另一个作用是创建一个属于自己的作用域，在作用域范围内可以访问一些变量
 componentWillReceiveProps(nextProps) {
   if (mapPropsToFields) {
     this.fieldsStore.updateFields(mapPropsToFields(nextProps));
   }
+}
+
+// 支持 callback 和 Promise 的两种调用方法
+const oldCb = callback;
+callback = (errors, values) => {
+  if (oldCb) {
+    oldCb(errors, values);
+  } else if (errors) {
+    reject({ errors, values });
+  } else {
+    resolve(values);
+  }
+};
+
+// PropTypes.shape 可以指定一个对象由特定的类型值组成
+const formShape = PropTypes.shape({
+  getFieldsValue: PropTypes.func,
+  getFieldValue: PropTypes.func,
+  getFieldInstance: PropTypes.func,
+  setFieldsValue: PropTypes.func,
+  setFields: PropTypes.func,
+  setFieldsInitialValue: PropTypes.func,
+  getFieldDecorator: PropTypes.func,
+  getFieldProps: PropTypes.func,
+  getFieldsError: PropTypes.func,
+  getFieldError: PropTypes.func,
+  isFieldValidating: PropTypes.func,
+  isFieldsValidating: PropTypes.func,
+  isFieldsTouched: PropTypes.func,
+  isFieldTouched: PropTypes.func,
+  isSubmitting: PropTypes.func,
+  submit: PropTypes.func,
+  validateFields: PropTypes.func,
+  resetFields: PropTypes.func,
+});
+
+// 获取指定样式，这个样式是渲染之后的样式
+function computedStyle(el, prop) {
+  const getComputedStyle = window.getComputedStyle;
+  const style =
+    // If we have getComputedStyle
+    getComputedStyle ?
+      // Query it
+      // TODO: From CSS-Query notes, we might need (node, null) for FF
+      getComputedStyle(el) :
+
+      // Otherwise, we are in IE and use currentStyle
+      el.currentStyle;
+  if (style) {
+    return style
+      [
+      // Switch to camelCase for CSSOM
+      // DEV: Grabbed from jQuery
+      // https://github.com/jquery/jquery/blob/1.9-stable/src/css.js#L191-L194
+      // https://github.com/jquery/jquery/blob/1.9-stable/src/core.js#L593-L597
+        prop.replace(/-(\w)/gi, (word, letter) => {
+          return letter.toUpperCase();
+        })
+      ];
+  }
+  return undefined;
+}
+
+// 父子关系可以使用 while 实现递归查询
+while ((nodeName = node.nodeName.toLowerCase()) !== 'body') {
+  const overflowY = computedStyle(node, 'overflowY');
+  // https://stackoverflow.com/a/36900407/3040605
+  if (
+    node !== n &&
+      (overflowY === 'auto' || overflowY === 'scroll') &&
+      node.scrollHeight > node.clientHeight
+  ) {
+    return node;
+  }
+  node = node.parentNode;
+}
+
+const node = ReactDOM.findDOMNode(instance);
+// Element.getBoundingClientRect()方法返回元素的大小及其相对于视口的位置。
+// rect 是一个具有四个属性left、top、right、bottom 的 DOMRect 对象
+// rect 的值是相对视口的，而不是绝对的，所以可能会因为随着滚动位置的变化而出现负数
+const top = node.getBoundingClientRect().top;
+// 获取节点 DOM，通过比较 top 的大小来判断距离顶部最近的一个节点
+if (node.type !== 'hidden' && (firstTop === undefined || firstTop > top)) {
+  firstTop = top;
+  firstNode = node;
 }
 ```

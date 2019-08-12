@@ -178,7 +178,7 @@ function createBaseForm(option = {}, mixins = []) {
 
         this.fieldsStore.setFieldsAsDirty();
 
-        // 应该是个校验值是否符合规则的脏检查函数
+        // 应该是个校验值是否符合规则的检查函数
         this.validateFieldsInternal([newField], {
           action,
           options: {
@@ -426,7 +426,6 @@ function createBaseForm(option = {}, mixins = []) {
         }
       },
 
-      // debugger
       saveRef(name, _, component) {
         if (!component) {
           const fieldMeta = this.fieldsStore.getFieldMeta(name);
@@ -529,6 +528,7 @@ function createBaseForm(option = {}, mixins = []) {
             ...field
           };
           newField.errors = undefined;
+          // 在验证值的同时，validating 值已经变成了 true，但是在控制台实际输出的是 false，猜想在某处该值又被重置为了 false
           newField.validating = true;
           newField.dirty = true;
           allRules[name] = this.getRules(fieldMeta, action);
@@ -551,6 +551,7 @@ function createBaseForm(option = {}, mixins = []) {
         if (validateMessages) {
           validator.messages(validateMessages);
         }
+        // 由 AsyncValidator 接管实际的校验工作
         validator.validate(allValues, options, errors => {
           const errorsGroup = {
             ...alreadyErrors
@@ -610,12 +611,14 @@ function createBaseForm(option = {}, mixins = []) {
             } else {
               nowField.errors = fieldErrors && fieldErrors.errors;
               nowField.value = allValues[name];
+              // validating 的状态，在校验完成后就会变成 false，如果校验是一个网络请求，那么校验时间就会较长，否则校验的过程基本上是无法察觉的
               nowField.validating = false;
               nowField.dirty = false;
               nowAllFields[name] = nowField;
             }
           });
           this.setFields(nowAllFields);
+          // 这个 callback 来自 validateFields
           if (callback) {
             if (expired.length) {
               expired.forEach(({ name }) => {
@@ -640,11 +643,16 @@ function createBaseForm(option = {}, mixins = []) {
         });
       },
 
+      // validateFields ([fieldNames: string[]], [options: object], callback(errors, values)) => void
+      // 校验并获取一组输入域的值与 Error，若 fieldNames 参数为空，则校验全部组件
+      // 从组件看来该方法同样支持 Promise 的调用方法
       validateFields(ns, opt, cb) {
         const pending = new Promise((resolve, reject) => {
+          // 按照先后顺序获取参数
           const { names, options } = getParams(ns, opt, cb);
           let { callback } = getParams(ns, opt, cb);
           if (!callback || typeof callback === "function") {
+            // 支持 callback 和 Promise 的两种调用方法
             const oldCb = callback;
             callback = (errors, values) => {
               if (oldCb) {
