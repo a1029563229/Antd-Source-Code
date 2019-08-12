@@ -38,4 +38,10 @@ import scrollIntoView from 'dom-scroll-into-view';
 
 // _.has(object, path) 检查 path 是否是object对象的直接属性。
 import has from 'lodash/has';
+
+// 响应css媒体查询的轻量级javascript库
+const enquire = require("enquire.js");
+
+// omit，轻量级
+import omit from 'omit.js';
 ```

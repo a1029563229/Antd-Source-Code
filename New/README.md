@@ -69,9 +69,6 @@ this.clickWaveTimeoutId = window.setTimeout(
   0
 );
 
-// 响应css媒体查询的轻量级javascript库
-const enquire = require("enquire.js");
-
 export default class Row extends React.Component<RowProps, RowState> {
   // ...
   renderRow = ({ getPrefixCls }: ConfigConsumerProps) => {
