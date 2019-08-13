@@ -211,6 +211,7 @@ function createBaseForm(option = {}, mixins = []) {
       getFieldDecorator(name, fieldOption) {
         // 返回了一个完成了事件绑定（收集事件和验证事件）的 props
         const props = this.getFieldProps(name, fieldOption);
+        // getFieldDecorator 会返回一个函数，函数接收一个 ReactElement 作为入参
         return fieldElem => {
           // We should put field in record if it is rendered
           this.renderFields[name] = true;
@@ -236,7 +237,10 @@ function createBaseForm(option = {}, mixins = []) {
             );
           }
           fieldMeta.originalProps = originalProps;
+          // 在这里做一个指针引用，引用原始节点
           fieldMeta.ref = fieldElem.ref;
+          // 函数最后会返回一个 fieldElem 的 clone 节点，而新的节点包含了注册过后的 props，例如 onChange、value
+          // 这些 props 会被传递给下一级的节点，例如 Input 节点，然后完成事件和属性绑定，获得一个超级节点（如 Input）
           return React.cloneElement(fieldElem, {
             ...props,
             ...this.fieldsStore.getFieldValuePropValue(fieldMeta)

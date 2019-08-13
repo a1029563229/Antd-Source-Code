@@ -351,4 +351,15 @@ if (node.type !== 'hidden' && (firstTop === undefined || firstTop > top)) {
   firstTop = top;
   firstNode = node;
 }
+
+// React.isValidElement(object) 验证对象是否为 React 元素，返回值为 true 或 false
+if (React.isValidElement(e)) {
+  node = e;
+} else if (React.isValidElement(e.message)) {
+  node = e.message;
+}
+
+// 这里没有 children ，是如何把子节点显示出来的？
+// 原生 DOM 就有 children 属性，children 属性就是子节点
+return <form {...formProps} className={formClassName} />;
 ```

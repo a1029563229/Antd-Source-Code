@@ -44,4 +44,7 @@ const enquire = require("enquire.js");
 
 // omit，轻量级
 import omit from 'omit.js';
+
+// react 的动画组件，通过一些设置可以更方便的执行动画
+import Animate from 'rc-animate';
 ```
