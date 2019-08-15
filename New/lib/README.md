@@ -47,4 +47,10 @@ import omit from 'omit.js';
 
 // react 的动画组件，通过一些设置可以更方便的执行动画
 import Animate from 'rc-animate';
+
+// 日历组件
+import RcCalendar from 'rc-calendar';
+
+// 选择框组件
+import RcSelect, { Option, OptGroup } from 'rc-select';
 ```
