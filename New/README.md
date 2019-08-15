@@ -378,4 +378,75 @@ const { onChange } = this.props;
 if (onChange) {
   // ...
 }
+
+// 很多地方都调用一个显式方法来获取 props 的值
+export function getPropValue(child: Option, prop?: any) {
+  if (prop === 'value') {
+    return getValuePropValue(child);
+  }
+  return child.props[prop];
+}
+
+// 使用方法来做判断，与 vue 同出一辙，这应该是一种比较流行的编程思想
+export function isMultiple(props: Partial<ISelectProps>) {
+  return props.multiple;
+}
+
+// 生成 uuid 的方法
+export function generateUUID(): string {
+  if (process.env.NODE_ENV === 'test') {
+    return 'test-uuid';
+  }
+  let d = new Date().getTime();
+  const uuid = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, c => {
+    // tslint:disable-next-line:no-bitwise
+    const r = (d + Math.random() * 16) % 16 | 0;
+    d = Math.floor(d / 16);
+    // tslint:disable-next-line:no-bitwise
+    return (c === 'x' ? r : (r & 0x7) | 0x8).toString(16);
+  });
+  return uuid;
+}
+
+// 使用一个 noop 函数作为函数类 props 的默认值，可以在其他地方减少一些判断的逻辑
+const noop = () => null;
+
+class Select extends React.Component<Partial<ISelectProps>, ISelectState> {
+  // ...
+  
+  // 在类中可以挂载一些静态方法，用于在类的内部使用（示意与类关联性较高）
+  public static getOptionsFromChildren = (
+    children: Array<React.ReactElement<any>>,
+    options: any[] = [],
+  ) => {
+    React.Children.forEach(children, child => {
+      if (!child) {
+        return;
+      }
+      const type = (child as React.ReactElement<any>).type as any;
+      if (type.isSelectOptGroup) {
+        Select.getOptionsFromChildren((child as React.ReactElement<any>).props.children, options);
+      } else {
+        options.push(child);
+      }
+    });
+    return options;
+  };
+
+  // ...
+
+  {/* React.cloneElement 被大量使用，应该显式使用该函数，而不是 <Component {...oldProps} {...newProps} /> */}
+  {React.cloneElement(inputElement, {
+    ref: this.saveInputRef,
+    onChange: this.onInputChange,
+    onKeyDown: chaining(
+      this.onInputKeyDown,
+      inputElement.props.onKeyDown,
+      this.props.onInputKeyDown,
+    ),
+    value: this.state.inputValue,
+    disabled: props.disabled,
+    className: inputCls,
+  })}
+}
 ```

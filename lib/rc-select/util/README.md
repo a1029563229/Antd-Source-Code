@@ -29,6 +29,7 @@ export function getValuePropValue(child: any) {
   throw new Error(`Need at least a key or a value or a label (only for OptGroup) for ${child}`);
 }
 
+// 很多地方都调用一个显式方法来获取 props 的值
 export function getPropValue(child: Option, prop?: any) {
   if (prop === 'value') {
     return getValuePropValue(child);
@@ -36,6 +37,7 @@ export function getPropValue(child: Option, prop?: any) {
   return child.props[prop];
 }
 
+// 使用方法来做判断，与 vue 同出一辙，这应该是一种比较流行的编程思想
 export function isMultiple(props: Partial<ISelectProps>) {
   return props.multiple;
 }
@@ -192,6 +194,7 @@ export function saveRef(instance: any, name: string): (node: any) => void {
   };
 }
 
+// 生成 uuid 的方法
 export function generateUUID(): string {
   if (process.env.NODE_ENV === 'test') {
     return 'test-uuid';

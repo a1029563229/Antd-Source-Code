@@ -1,10 +1,14 @@
 # Select.tsx
 ```tsx
 import classnames from 'classnames';
+// 给 DOM 元素动态添加/删除/切换 class
 import classes from 'component-classes';
 import Animate from 'rc-animate';
+// Menu 菜单
 import { Item as MenuItem, ItemGroup as MenuItemGroup } from 'rc-menu';
+// 把 children 转换为数组
 import childrenToArray from 'rc-util/lib/Children/toArray';
+// 键位的枚举，例如 KeyCode.ENTER 代表回车键的 keyCode
 import KeyCode from 'rc-util/lib/KeyCode';
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
@@ -41,6 +45,7 @@ import {
 
 const SELECT_EMPTY_VALUE_KEY = 'RC_SELECT_EMPTY_VALUE_KEY';
 
+// 使用一个 noop 函数作为函数类 props 的默认值，可以在其他地方减少一些判断的逻辑
 const noop = () => null;
 
 function chaining(...fns: any[]) {
@@ -107,10 +112,12 @@ class Select extends React.Component<Partial<ISelectProps>, ISelectState> {
       skipBuildOptionsInfo: false,
     };
 
+    // 是否展开
     if ('open' in nextProps) {
       newState.open = nextProps.open;
     }
 
+    // 当前指定条目
     if ('value' in nextProps) {
       const value = Select.getValueFromProps(nextProps);
       newState.value = value;
@@ -121,6 +128,7 @@ class Select extends React.Component<Partial<ISelectProps>, ISelectState> {
     return newState;
   };
 
+  // 在类中可以挂载一些静态方法，用于在类的内部使用（示意与类关联性较高）
   public static getOptionsFromChildren = (
     children: Array<React.ReactElement<any>>,
     options: any[] = [],
@@ -220,6 +228,7 @@ class Select extends React.Component<Partial<ISelectProps>, ISelectState> {
     return value;
   };
 
+  // 函数在声明时不进行赋值，只声明类型
   public saveInputRef: (ref: HTMLInputElement) => void;
   public saveInputMirrorRef: (ref: HTMLSpanElement) => void;
   public saveTopCtrlRef: (ref: HTMLDivElement) => void;
@@ -773,6 +782,7 @@ class Select extends React.Component<Partial<ISelectProps>, ISelectState> {
     // Add space to the end of the inputValue as the width measurement tolerance
     return (
       <div className={`${props.prefixCls}-search__field__wrap`}>
+        {/* React.cloneElement 被大量使用，应该显式使用该函数，而不是 <Component {...oldProps} {...newProps} /> */}
         {React.cloneElement(inputElement, {
           ref: this.saveInputRef,
           onChange: this.onInputChange,

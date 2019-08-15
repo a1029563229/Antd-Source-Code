@@ -53,4 +53,16 @@ import RcCalendar from 'rc-calendar';
 
 // 选择框组件
 import RcSelect, { Option, OptGroup } from 'rc-select';
+
+// 给 DOM 元素动态添加/删除/切换 class
+import classes from 'component-classes';
+
+// Menu 菜单
+import { Item as MenuItem, ItemGroup as MenuItemGroup } from 'rc-menu';
+
+// 把 children 转换为数组
+import childrenToArray from 'rc-util/lib/Children/toArray';
+
+// 键位的枚举，例如 KeyCode.ENTER 代表回车键的 keyCode
+import KeyCode from 'rc-util/lib/KeyCode';
 ```
