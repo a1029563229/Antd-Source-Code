@@ -1,4 +1,7 @@
 # ant-design 源码阅读笔记
+本文是阅读 Antd 源码时的笔记，由于Antd 的组件在实现上重复性略高，所以只选取了一些组件的实现，通过代码 + 注释的方式记录笔记。
+
+（在“其他”一栏记录了个人的最大收获）
 
 ## 概述
 + [入口文件](https://github.com/a1029563229/Antd-Source-Code/tree/master/entry)
