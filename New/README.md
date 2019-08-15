@@ -362,4 +362,20 @@ if (React.isValidElement(e)) {
 // 这里没有 children ，是如何把子节点显示出来的？
 // 原生 DOM 就有 children 属性，children 属性就是子节点
 return <form {...formProps} className={formClassName} />;
+
+// keyCode 13 是回车键
+if (e.keyCode === 13 && onPressEnter) {
+  onPressEnter(e);
+}
+
+// 当组件非完全受控组件时，取传入的 value 值
+if (!('value' in this.props)) {
+  this.setState({ value }, callback);
+}
+// 组件内部处理了值以后，再通知给外部
+// 通过 getDerivedStateFromProps 又可以让组件变成完全受控组件
+const { onChange } = this.props;
+if (onChange) {
+  // ...
+}
 ```
