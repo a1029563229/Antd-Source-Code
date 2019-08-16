@@ -65,4 +65,13 @@ import childrenToArray from 'rc-util/lib/Children/toArray';
 
 // 键位的枚举，例如 KeyCode.ENTER 代表回车键的 keyCode
 import KeyCode from 'rc-util/lib/KeyCode';
+
+// react 轮播组件
+import { Settings } from 'react-slick';
+
+// _.debounce(func, [wait=0], [options={}]) 防抖函数
+import debounce from 'lodash/debounce';
+
+// react tooltip 插件
+import RcTooltip from 'rc-tooltip';
 ```
