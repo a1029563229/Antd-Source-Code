@@ -449,4 +449,32 @@ class Select extends React.Component<Partial<ISelectProps>, ISelectState> {
     className: inputCls,
   })}
 }
+
+// 获取浏览器支持的 style 属性
+window.document.documentElement.style
+
+// createEvent 创建一个指定类型的事件。其返回的对象必须先初始化并可以被传递给 element.dispatchEvent
+// 创建事件
+var event = document.createEvent('Event');
+
+// 定义事件名为'build'.
+event.initEvent('build', true, true);
+
+// 监听事件
+elem.addEventListener('build', function (e) {
+  // e.target matches elem
+}, false);
+
+// 触发对象可以是任何元素或其他事件目标
+elem.dispatchEvent(event);
+
+// 获取元素的上滚距离
+getCurrentScrollTop = () => {
+  const getTarget = this.props.target || getDefaultTarget;
+  const targetNode = getTarget();
+  if (targetNode === window) {
+    return window.pageYOffset || document.body.scrollTop || document.documentElement!.scrollTop;
+  }
+  return (targetNode as HTMLElement).scrollTop;
+};
 ```
